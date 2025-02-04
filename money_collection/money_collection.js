@@ -19,11 +19,18 @@ document.getElementById('addRow').addEventListener('click', function () {
 });
 
 document.getElementById('reset').addEventListener('click', function () {
-    document.querySelector('#collectionTable tbody').innerHTML = '';
-    document.getElementById('totalAmount').innerText = '';
-    localStorage.removeItem('moneyCollectionData');
-    updateSerialNumbers();
+    // Show a confirmation popup
+    const isConfirmed = window.confirm("Are you sure you want to reset all data?");
+    
+    // If confirmed, proceed with the reset
+    if (isConfirmed) {
+        document.querySelector('#collectionTable tbody').innerHTML = '';
+        document.getElementById('totalAmount').innerText = '';
+        localStorage.removeItem('moneyCollectionData');
+        updateSerialNumbers();
+    }
 });
+
 
 document.getElementById('calculateTotal').addEventListener('click', function () {
     var rows = document.querySelectorAll('#collectionTable tbody tr');
