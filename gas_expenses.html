@@ -93,13 +93,17 @@
         }
 
         function resetForm() {
-            const table = document.getElementById('expenseTable');
-            const rowCount = table.rows.length;
-            for (let i = rowCount - 1; i > 0; i--) {
-                table.deleteRow(i);
+            if (confirm("Are you sure you want to reset the form? This action cannot be undone.")) {
+                const table = document.getElementById('expenseTable');
+                const rowCount = table.rows.length;
+                for (let i = rowCount - 1; i > 0; i--) {
+                    table.deleteRow(i);
+                }
+                document.getElementById('totalAmount').innerText = '';
+                alert("Form has been reset successfully.");
             }
-            document.getElementById('totalAmount').innerText = '';
         }
+        
 
         function exportToExcel() {
             const table = document.getElementById('expenseTable');
