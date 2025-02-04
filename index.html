@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Expenses</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById("current-time").textContent = now.toLocaleString();
+        }
+        setInterval(updateTime, 1000);
+        window.onload = updateTime;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>📊 Monthly Expenses</h1>
+        <p>Professional Expense Management System</p>
+        <div class="time-box">
+            <span id="current-time"></span>
+        </div>
+    </header>
+
+    <main>
+        <section class="expense-categories">
+            <div class="category">
+                <h3>🍽 Meal Counting System</h3>
+                <p>Track daily meal expenses and counts</p>
+                <a href="meal counting system.html">View Details →</a>
+            </div>
+            <div class="category">
+                <h3>💰 Total Money Collection</h3>
+                <p>Monitor overall financial inflow</p>
+                <a href="money_collection/money collection system.html">View Details →</a>
+            </div>
+            <div class="category">
+                <h3>🛒 Daily Marketing Expenses</h3>
+                <p>Record daily purchase costs</p>
+                <a href="daily_marketing.html">View Details →</a>
+            </div>
+            <div class="category">
+                <h3>🧯 Gas Expenses</h3>
+                <p>Track fuel and gas consumption costs</p>
+                <a href="gas_expenses.html">View Details →</a>
+            </div>
+            <div class="category">
+                <h3>🛢 Cooking Oil Expenses</h3>
+                <p>Monitor oil usage and expenses</p>
+                <a href="oil_expenses.html">View Details →</a>
+            </div>
+            <div class="category">
+                <h3>👨‍🍳 Cook's Salary</h3>
+                <p>Manage staff payment records</p>
+                <a href="cook_salary.html">View Details →</a>
+            </div>
+            <div class="category">
+                <h3>➕ Extra Expenses</h3>
+                <p>Track miscellaneous costs</p>
+                <a href="extra_expenses.html">View Details →</a>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>© 2024 Monthly Expenses Calculator. All rights reserved.</p>
+        <div class="contact">
+            <a href="mailto:subhankardas1534@gmail.com">📧 subhankardas1534@gmail.com</a>
+            <a href="https://wa.me/+918093397462" target="_blank">📞 +91 8093397462</a>
+        </div>
+    </footer>
+</body>
+</html>

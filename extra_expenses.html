@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extra Expenses Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #FFF5E1; /* Lighter orange background */
+        }
+        .hover-animate {
+            transition: transform 0.2s ease-in-out;
+        }
+        .hover-animate:hover {
+            transform: scale(1.05);
+        }
+        .curve {
+            border-radius: 15px; /* Reduced curve amount */
+        }
+    </style>
+</head>
+<body class="bg-light-orange">
+    <header class="bg-orange-600 text-white p-4 curve">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="text-white text-lg hover-animate"><i class="fas fa-home"></i> Home</a>
+            <h1 class="text-2xl font-bold text-center">Extra Expenses Management System</h1>
+            <div></div>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-8 p-4 bg-white shadow-md rounded curve">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Expense Records</h2>
+        </div>
+        <table class="min-w-full bg-white curve">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border-b">Serial Number</th>
+                    <th class="py-2 px-4 border-b">Date</th>
+                    <th class="py-2 px-4 border-b">Description</th>
+                    <th class="py-2 px-4 border-b">Amount (INR)</th>
+                </tr>
+            </thead>
+            <tbody id="expenseTable">
+                <!-- Dynamic rows will be added here -->
+            </tbody>
+        </table>
+        <div class="flex justify-between items-center mt-4">
+            <button id="addRow" class="bg-orange-600 text-white px-4 py-2 rounded hover-animate"><i class="fas fa-plus"></i> Add More</button>
+        </div>
+        <div class="flex justify-start items-center mt-4 space-x-4">
+            <button id="saveData" class="bg-blue-600 text-white px-4 py-2 rounded hover-animate"><i class="fas fa-save"></i> Save</button>
+            <button id="resetData" class="bg-red-600 text-white px-4 py-2 rounded hover-animate"><i class="fas fa-trash"></i> Reset</button>
+            <button id="calculateTotal" class="bg-yellow-600 text-white px-4 py-2 rounded hover-animate"><i class="fas fa-calculator"></i> Calculate Total</button>
+            <button id="exportData" class="bg-green-600 text-white px-4 py-2 rounded hover-animate"><i class="fas fa-file-excel"></i> Export to Excel</button>
+        </div>
+        <div id="totalExpense" class="mt-4 text-lg font-bold"></div>
+    </main>
+
+    <footer class="bg-orange-600 text-white p-4 mt-8 curve">
+        <div class="container mx-auto text-center">
+            &copy; 2023 Extra Expenses Management System
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const expenseTable = document.getElementById('expenseTable');
+            const addRowButton = document.getElementById('addRow');
+            const saveDataButton = document.getElementById('saveData');
+            const resetDataButton = document.getElementById('resetData');
+            const calculateTotalButton = document.getElementById('calculateTotal');
+            const exportDataButton = document.getElementById('exportData');
+            const totalExpenseDiv = document.getElementById('totalExpense');
+
+            function loadSavedData() {
+                const savedData = JSON.parse(localStorage.getItem('expenseData')) || [];
+                savedData.forEach((data, index) => {
+                    addRow(data.serial, data.date, data.description, data.amount);
+                });
+            }
+
+            function addRow(serial = '', date = '', description = '', amount = '') {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="py-2 px-4 border-b">${expenseTable.rows.length + 1}</td>
+                    <td class="py-2 px-4 border-b"><input type="date" value="${date}" class="w-full border rounded px-2 py-1"></td>
+                    <td class="py-2 px-4 border-b"><input type="text" value="${description}" class="w-full border rounded px-2 py-1"></td>
+                    <td class="py-2 px-4 border-b"><input type="number" value="${amount}" class="w-full border rounded px-2 py-1"></td>
+                `;
+                expenseTable.appendChild(row);
+            }
+
+            function saveData() {
+                const rows = expenseTable.querySelectorAll('tr');
+                const data = [];
+                rows.forEach(row => {
+                    const serial = row.children[0].textContent;
+                    const date = row.children[1].querySelector('input').value;
+                    const description = row.children[2].querySelector('input').value;
+                    const amount = row.children[3].querySelector('input').value;
+                    data.push({ serial, date, description, amount });
+                });
+                localStorage.setItem('expenseData', JSON.stringify(data));
+                alert('Data saved successfully!');
+            }
+
+            function resetData() {
+                if (confirm('Are you sure you want to reset all data?')) {
+                    localStorage.removeItem('expenseData');
+                    expenseTable.innerHTML = '';
+                    totalExpenseDiv.textContent = '';
+                }
+            }
+
+            function calculateTotal() {
+                const rows = expenseTable.querySelectorAll('tr');
+                let total = 0;
+                rows.forEach(row => {
+                    const amount = parseFloat(row.children[3].querySelector('input').value) || 0;
+                    total += amount;
+                });
+                totalExpenseDiv.textContent = `Total Expense: ₹${total.toFixed(2)}`;
+            }
+
+            function exportToExcel() {
+                const rows = expenseTable.querySelectorAll('tr');
+                const data = [['Serial Number', 'Date', 'Description', 'Amount (INR)']];
+                rows.forEach(row => {
+                    const serial = row.children[0].textContent;
+                    const date = row.children[1].querySelector('input').value;
+                    const description = row.children[2].querySelector('input').value;
+                    const amount = row.children[3].querySelector('input').value;
+                    data.push([serial, date, description, amount]);
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Expense Records');
+                XLSX.writeFile(wb, 'ExpenseRecords.xlsx');
+            }
+
+            addRowButton.addEventListener('click', () => addRow());
+            saveDataButton.addEventListener('click', saveData);
+            resetDataButton.addEventListener('click', resetData);
+            calculateTotalButton.addEventListener('click', calculateTotal);
+            exportDataButton.addEventListener('click', exportToExcel);
+
+            loadSavedData();
+        });
+    </script>
+</body>
+</html>

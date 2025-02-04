@@ -1,0 +1,256 @@
+<html>
+    <head>
+        <title>Cooking Oil Expense Tracker</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        <style>
+            /* General button styling */
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    color: white;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    gap: 8px; /* Space between icon and text */
+}
+
+/* Add More button */
+.add-more-btn {
+    background-color: #f97316; /* orange-500 */
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.add-more-btn:hover {
+    background-color: #ea580c; /* orange-600 */
+    transform: scale(1.05);
+}
+
+.add-more-btn:active {
+    background-color: #c2410c; /* orange-700 */
+}
+
+/* Save button */
+.save-btn {
+    background-color: #ea580c; /* orange-600 */
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.save-btn:hover {
+    background-color: #d97706; /* orange-700 */
+    transform: scale(1.05);
+}
+
+.save-btn:active {
+    background-color: #b45309; /* orange-800 */
+}
+
+/* Reset button */
+.reset-btn {
+    background-color: #c2410c; /* orange-700 */
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.reset-btn:hover {
+    background-color: #9a3412; /* orange-800 */
+    transform: scale(1.05);
+}
+
+.reset-btn:active {
+    background-color: #7c2d12; /* orange-900 */
+}
+
+/* Calculate Total button */
+.calculate-btn {
+    background-color: #9a3412; /* orange-800 */
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.calculate-btn:hover {
+    background-color: #7c2d12; /* orange-900 */
+    transform: scale(1.05);
+}
+
+.calculate-btn:active {
+    background-color: #6a2d14; /* orange-1000 */
+}
+
+/* Export to Excel button */
+.export-btn {
+    background-color: #7c2d12; /* orange-900 */
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.export-btn:hover {
+    background-color: #6a2d14; /* orange-1000 */
+    transform: scale(1.05);
+}
+
+.export-btn:active {
+    background-color: #5e2c0f; /* orange-1100 */
+}
+
+        </style>
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                loadData();
+            });
+    
+            function addRow(date = '', quantity = '', amount = '') {
+                const table = document.getElementById('expenseTable').getElementsByTagName('tbody')[0];
+                const rowCount = table.rows.length + 1;
+                const row = table.insertRow();
+    
+                const cell1 = row.insertCell(0);
+                const element1 = document.createElement('span');
+                element1.innerText = rowCount;
+                cell1.className = 'text-center py-2 px-4 border';
+                cell1.appendChild(element1);
+    
+                const cell2 = row.insertCell(1);
+                const element2 = document.createElement('input');
+                element2.type = 'date';
+                element2.className = 'border p-2 text-center rounded';
+                element2.value = date;
+                cell2.className = 'text-center py-2 px-4 border';
+                cell2.appendChild(element2);
+    
+                const cell3 = row.insertCell(2);
+                const element3 = document.createElement('input');
+                element3.type = 'number';
+                element3.className = 'border p-2 text-center rounded';
+                element3.value = quantity;
+                cell3.className = 'text-center py-2 px-4 border';
+                cell3.appendChild(element3);
+    
+                const cell4 = row.insertCell(3);
+                const element4 = document.createElement('input');
+                element4.type = 'number';
+                element4.className = 'border p-2 text-center rounded';
+                element4.value = amount;
+                cell4.className = 'text-center py-2 px-4 border';
+                cell4.appendChild(element4);
+            }
+    
+            function calculateTotal() {
+                const table = document.getElementById('expenseTable');
+                let totalQuantity = 0;
+                let totalAmount = 0;
+                for (let i = 1; i < table.rows.length; i++) {
+                    const quantity = table.rows[i].cells[2].children[0].value;
+                    const amount = table.rows[i].cells[3].children[0].value;
+                    totalQuantity += parseFloat(quantity) || 0;
+                    totalAmount += parseFloat(amount) || 0;
+                }
+                document.getElementById('totalQuantity').innerText = 'Total Quantity: ' + totalQuantity.toFixed(2) + ' Liters';
+                document.getElementById('totalAmount').innerText = 'Total Amount: INR ' + totalAmount.toFixed(2);
+            }
+    
+            function saveData() {
+                const table = document.getElementById('expenseTable');
+                const data = [];
+                for (let i = 1; i < table.rows.length; i++) {
+                    const date = table.rows[i].cells[1].children[0].value;
+                    const quantity = table.rows[i].cells[2].children[0].value;
+                    const amount = table.rows[i].cells[3].children[0].value;
+                    if (date || quantity || amount) {
+                        data.push({ date, quantity, amount });
+                    }
+                }
+                localStorage.setItem('expenseData', JSON.stringify(data));
+                alert('Data saved successfully!');
+            }
+    
+            function loadData() {
+                const data = JSON.parse(localStorage.getItem('expenseData')) || [];
+                const table = document.getElementById('expenseTable').getElementsByTagName('tbody')[0];
+                table.innerHTML = ''; 
+    
+                data.forEach(item => addRow(item.date, item.quantity, item.amount));
+    
+                if (data.length === 0) {
+                    addRow();
+                }
+            }
+    
+            function resetForm() {
+                if (confirm('Are you sure you want to reset all data?')) {
+                    localStorage.removeItem('expenseData');
+                    const table = document.getElementById('expenseTable').getElementsByTagName('tbody')[0];
+                    table.innerHTML = ''; 
+                    addRow();
+                    document.getElementById('totalQuantity').innerText = '';
+                    document.getElementById('totalAmount').innerText = '';
+                }
+            }
+    
+            function exportToExcel() {
+                const table = document.getElementById('expenseTable');
+                let data = [['Date', 'Quantity (Liters)', 'Amount (INR)']];
+    
+                for (let i = 1; i < table.rows.length; i++) {
+                    const date = table.rows[i].cells[1].children[0].value;
+                    const quantity = table.rows[i].cells[2].children[0].value;
+                    const amount = table.rows[i].cells[3].children[0].value;
+                    if (date || quantity || amount) {
+                        data.push([date, quantity, amount]);
+                    }
+                }
+    
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Expenses');
+                XLSX.writeFile(wb, 'Cooking_Oil_Expenses.xlsx');
+            }
+        </script>
+    </head>
+    <body class="bg-orange-100 text-gray-800">
+        <header class="bg-orange-500 text-white p-6 rounded-b-3xl rounded-t-3xl">
+            <div class="container mx-auto flex justify-between items-center">
+                <a href="index.html" class="text-white hover:text-orange-200 transition transform hover:scale-105"><i class="fas fa-home"></i> Home</a>
+                <h1 class="text-2xl font-bold text-center flex-grow">Cooking Oil Expense Tracker</h1>
+            </div>
+        </header>
+        <div class="container mx-auto mt-6">
+            <table id="expenseTable" class="min-w-full bg-white border border-gray-300 mb-4 rounded-lg overflow-hidden ">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border text-center">#</th>
+                        <th class="py-2 px-4 border text-center">Date</th>
+                        <th class="py-2 px-4 border text-center">Quantity (Liters)</th>
+                        <th class="py-2 px-4 border text-center">Amount (INR)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="mt-4 flex justify-start space-x-2">
+                <button onclick="addRow()" class="add-more-btn bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 active:bg-orange-700">
+                    <i class="fas fa-plus"></i>
+                    <span>Add More</span>
+                </button>
+                <button onclick="saveData()" class="save-btn bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 active:bg-orange-800">
+                    <i class="fas fa-save"></i>
+                    <span>Save</span>
+                </button>
+                <button onclick="resetForm()" class="reset-btn bg-orange-700 text-white px-4 py-2 rounded-lg hover:bg-orange-800 active:bg-orange-900">
+                    <i class="fas fa-redo"></i>
+                    <span>Reset</span>
+                </button>
+                <button onclick="calculateTotal()" class="calculate-btn bg-orange-800 text-white px-4 py-2 rounded-lg hover:bg-orange-900 active:bg-orange-1000">
+                    <i class="fas fa-calculator"></i>
+                    <span>Calculate Total</span>
+                </button>
+                <button onclick="exportToExcel()" class="export-btn bg-orange-900 text-white px-4 py-2 rounded-lg hover:bg-orange-1000 active:bg-orange-1100">
+                    <i class="fas fa-file-excel"></i>
+                    <span>Export to Excel</span>
+                </button>
+            </div>
+            <div id="totalQuantity" class="mt-4 text-xl font-bold"></div>
+            <div id="totalAmount" class="mt-2 text-xl font-bold"></div>
+        </div>
+    </body>
+    
+</html>

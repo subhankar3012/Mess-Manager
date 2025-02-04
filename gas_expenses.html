@@ -1,0 +1,173 @@
+<html>
+<head>
+    <title>Gas Expenses Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <style>
+        .btn {
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .a{
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .a:hover{
+            transform: scale(1.05);
+        }
+        .a:active{
+            transform: scale(0.95);
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            loadData();
+        });
+
+        function addRow() {
+            const table = document.getElementById('expenseTable');
+            const rowCount = table.rows.length;
+            const row = table.insertRow(rowCount);
+
+            row.innerHTML = `
+                <td class="border px-4 py-2">${rowCount}</td>
+                <td class="border px-4 py-2"><input type="date" class="w-full px-2 py-1 border rounded-lg" /></td>
+                <td class="border px-4 py-2"><input type="number" class="w-full px-2 py-1 border rounded-lg" /></td>
+                <td class="border px-4 py-2">
+                    <select class="w-full px-2 py-1 border rounded-lg">
+                        <option value="Paid">Paid</option>
+                        <option value="Unpaid">Unpaid</option>
+                    </select>
+                </td>
+                <td class="border px-4 py-2"><input type="date" class="w-full px-2 py-1 border rounded-lg" /></td>
+            `;
+        }
+
+        function calculateTotal() {
+            const table = document.getElementById('expenseTable');
+            let total = 0;
+            for (let i = 1; i < table.rows.length; i++) {
+                const amount = table.rows[i].cells[2].querySelector('input').value;
+                total += parseFloat(amount) || 0;
+            }
+            document.getElementById('totalAmount').innerText = `Total: INR ${total.toFixed(2)}`;
+        }
+
+        function saveData() {
+            const table = document.getElementById('expenseTable');
+            const expenses = [];
+            for (let i = 1; i < table.rows.length; i++) {
+                const date = table.rows[i].cells[1].querySelector('input').value;
+                const amount = table.rows[i].cells[2].querySelector('input').value;
+                const status = table.rows[i].cells[3].querySelector('select').value;
+                const paidDate = table.rows[i].cells[4].querySelector('input').value;
+                expenses.push({ date, amount, status, paidDate });
+            }
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            alert('Data saved successfully!');
+        }
+
+        function loadData() {
+            const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+            const table = document.getElementById('expenseTable');
+            for (let i = 0; i < expenses.length; i++) {
+                const row = table.insertRow(i + 1);
+                row.innerHTML = `
+                    <td class="border px-4 py-2">${i + 1}</td>
+                    <td class="border px-4 py-2"><input type="date" class="w-full px-2 py-1 border rounded-lg" value="${expenses[i].date}" /></td>
+                    <td class="border px-4 py-2"><input type="number" class="w-full px-2 py-1 border rounded-lg" value="${expenses[i].amount}" /></td>
+                    <td class="border px-4 py-2">
+                        <select class="w-full px-2 py-1 border rounded-lg">
+                            <option value="Paid" ${expenses[i].status === 'Paid' ? 'selected' : ''}>Paid</option>
+                            <option value="Unpaid" ${expenses[i].status === 'Unpaid' ? 'selected' : ''}>Unpaid</option>
+                        </select>
+                    </td>
+                    <td class="border px-4 py-2"><input type="date" class="w-full px-2 py-1 border rounded-lg" value="${expenses[i].paidDate}" /></td>
+                `;
+            }
+        }
+
+        function resetForm() {
+            const table = document.getElementById('expenseTable');
+            const rowCount = table.rows.length;
+            for (let i = rowCount - 1; i > 0; i--) {
+                table.deleteRow(i);
+            }
+            document.getElementById('totalAmount').innerText = '';
+        }
+
+        function exportToExcel() {
+            const table = document.getElementById('expenseTable');
+            const data = [];
+            const headers = [];
+    
+            // Get table headers
+            for (let th of table.rows[0].cells) {
+                headers.push(th.innerText);
+            }
+            data.push(headers);
+    
+            // Get table rows
+            for (let i = 1; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                const rowData = [];
+    
+                rowData.push(row.cells[0].innerText); // SL.NO
+                rowData.push(row.cells[1].querySelector('input').value); // Date
+                rowData.push(row.cells[2].querySelector('input').value); // Amount
+                rowData.push(row.cells[3].querySelector('select').value); // Status
+                rowData.push(row.cells[4].querySelector('input').value); // Paid Date
+    
+                data.push(rowData);
+            }
+    
+            // Create worksheet and workbook
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Gas Expenses");
+    
+            // Save file
+            XLSX.writeFile(wb, 'GasExpenses.xlsx');
+        }
+    </script>
+</head>
+<body class="bg-orange-100 text-gray-800">
+    <div class="container mx-auto p-4">
+        <header class="bg-orange-500 header-bg text-white p-4 flex justify-between items-center shadow-lg relative rounded-lg mb-4">
+            <!-- Centered H1 -->
+            <h1 class="text-2xl font-bold absolute left-1/2 transform -translate-x-1/2 ">Gas Expenses Tracker</h1>
+            
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="a text-white text-lg"><i class="fas fa-home"></i> Home</a>
+            </div>
+        </header>
+        <table id="expenseTable" class="min-w-full bg-white border border-gray-300 mb-4 rounded-lg overflow-hidden">
+            <thead class="bg-orange-200">
+                <tr>
+                    <th class="border px-4 py-2">SL.NO</th>
+                    <th class="border px-4 py-2">Date</th>
+                    <th class="border px-4 py-2">Amount (INR)</th>
+                    <th class="border px-4 py-2">Status</th>
+                    <th class="border px-4 py-2">Paid Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be added dynamically here -->
+            </tbody>
+        </table>
+        <div id="totalAmount" class="mt-4 text-xl font-bold"></div>
+        <div class="mt-4 flex justify-first space-x-2">
+            <button onclick="addRow()" class="btn bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 active:bg-orange-700"><i class="fas fa-plus"></i> Add More</button>
+            <button onclick="saveData()" class="btn bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 active:bg-orange-800"><i class="fas fa-save"></i> Save</button>
+            <button onclick="resetForm()" class="btn bg-orange-700 text-white px-4 py-2 rounded-lg hover:bg-orange-800 active:bg-orange-900"><i class="fas fa-trash"></i> Reset</button>
+            <button onclick="calculateTotal()" class="btn bg-orange-800 text-white px-4 py-2 rounded-lg hover:bg-orange-900 active:bg-orange-1000"><i class="fas fa-calculator"></i> Calculate Total</button>
+            <button onclick="exportToExcel()" class="btn bg-orange-900 text-white px-4 py-2 rounded-lg hover:bg-orange-1000 active:bg-orange-1100"><i class="fas fa-file-excel"></i> Export to Excel</button>
+        </div>
+    </div>
+</body>
+</html>

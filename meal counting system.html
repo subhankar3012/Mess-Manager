@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Counting System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .scroll-container{
+            border-radius: 7px;
+        }
+        header{
+            border-radius: 7px;
+        }
+        .header-bg {
+            background: linear-gradient(90deg, rgba(255, 123, 0, 1) 0%, rgba(255, 94, 0, 1) 100%);
+        }
+        .btn-gradient {
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(90deg, rgba(255, 123, 0, 1) 0%, rgba(255, 94, 0, 1) 100%);
+            transition: 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(90deg, rgba(255, 94, 0, 1) 0%, rgba(255, 123, 0, 1) 100%);
+            transform: scale(1.1); /* Slightly enlarge */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+
+        }
+        /* Ensure buttons have a 20px gap */
+        .mt-4 {
+            display: flex;
+            justify-content: start;
+            align-items: end;
+            gap: 20px; /* Space between buttons */
+        }
+
+        /* Hover animation */
+        .btn-gradient:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        a{ color: white;
+            padding: 5px 7px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(90deg, rgba(255, 123, 0, 1) 0%, rgba(255, 94, 0, 1) 100%);
+            transition: 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+        a:hover{
+            
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+
+        /* Different colors for each button */
+        .save-data {
+            background: linear-gradient(90deg, #28a745 0%, #218838 100%);
+        }
+        .save-data:hover{
+            background: linear-gradient(90deg, #28a745 0%, #218838 100%);
+        }
+
+        #resetButton {
+            background: linear-gradient(90deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .calculate-total {
+            background: linear-gradient(90deg, #fd7e14 0%, #e86c0c 100%);
+        }
+        .calculate-total:hover {
+            background: linear-gradient(90deg, #fd7e14 0%, #e86c0c 100%);
+        }
+
+        .export-excel {
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+        }
+        .export-excel:hover{
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+        }
+
+        #addRow {
+            background: linear-gradient(90deg, #17a2b8 0%, #117a8b 100%);
+        }
+
+        .custom-checkbox {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 0.375rem;
+            border: 2px solid #ff7b00;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            outline: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .custom-checkbox:checked {
+            background-color: #ff7b00;
+            border-color: #ff7b00;
+        }
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: rgba(255, 94, 0, 1);
+            z-index: 2;
+        }
+        .fixed-name {
+            position: sticky;
+            left: 0;
+            background-color: rgba(255, 94, 0, 1);
+            z-index: 3;
+            opacity: 90%;
+            white-space: nowrap;
+            min-width: 150px;
+        }
+        tfoot td {
+            position: sticky;
+            left: 0;
+            background-color: rgba(255, 94, 0, 1);
+            z-index: 3;
+            font-weight: bold;
+        }
+        .scroll-container {
+            overflow-x: auto;
+            max-width: 100%;
+            position: relative;
+        }
+        .custom-checkbox:disabled {
+            background-color: #ccc;
+            border-color: #999;
+            cursor: not-allowed;
+        }
+        .custom-checkbox:disabled:checked {
+            background-color: orange;
+            border-color: #ff7b00;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <header class="header-bg text-white p-4 flex justify-between items-center shadow-lg relative">
+        <h1 class="text-2xl font-bold absolute left-1/2 transform -translate-x-1/2">Meal Counting System</h1>
+        <div class="flex items-center space-x-4">
+            <a href="index.html" class="text-white text-lg"><i class="fas fa-home"></i> Home</a>
+            <div id="timestamp" class="text-lg"></div>
+        </div>
+    </header>
+
+    <main class="p-4">
+        <div class="scroll-container">
+            <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                <thead class="bg-orange-600 text-white">
+                    <tr>
+                        <th class="border px-4 py-2 fixed-name">Student ID</th>
+                        <th class="border px-4 py-2 fixed-name">Name</th>
+                        <script>
+                            for (let i = 1; i <= 31; i++) {
+                                document.write(`<th class="border px-4 py-2">Day ${i} Lunch</th>`);
+                                document.write(`<th class="border px-4 py-2">Day ${i} Dinner</th>`);
+                            }
+                        </script>
+                        <th class="border px-4 py-2">Total Meals</th>
+                        <th class="border px-4 py-2">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTable"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="border px-4 py-2 text-center font-bold bg-gray-200">Daily Totals</td>
+                        <script>
+                            for (let i = 1; i <= 31; i++) {
+                                document.write(`<td class="border px-4 py-2 text-center daily-total bg-gray-200" data-day="${i}" colspan="2">0</td>`);
+                            }
+                        </script>
+                        <td class="border px-4 py-2 text-center font-bold bg-gray-200">-</td>
+                        <td class="border px-4 py-2 text-center font-bold bg-gray-200">-</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="border px-4 py-2 text-center font-bold bg-gray-200">Day/Night Totals</td>
+                        <script>
+                            for (let i = 1; i <= 31; i++) {
+                                document.write(`<td class="border px-4 py-2 text-center day-total bg-gray-200" data-day="${i}">0</td>`);
+                                document.write(`<td class="border px-4 py-2 text-center night-total bg-gray-200" data-day="${i}">0</td>`);
+                            }
+                        </script>
+                        <td class="border px-4 py-2 text-center font-bold bg-gray-200">-</td>
+                        <td class="border px-4 py-2 text-center font-bold bg-gray-200">-</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="mt-4 flex justify-start items-end gap-2">
+            <button class="btn-gradient text-white px-4 py-2 rounded shadow-md save-data">Save</button>
+            <button id="resetButton" class="btn-gradient bg-red-600 text-white px-4 py-2 rounded shadow-md">Reset</button>
+            <button class="btn-gradient bg-yellow-600 text-white px-4 py-2 rounded shadow-md calculate-total">Calculate Total Meals</button>
+            <button class="btn-gradient bg-blue-600 text-white px-4 py-2 rounded shadow-md export-excel">Export to Excel</button>
+            <button id="addRow" class="btn-gradient text-white px-4 py-2 rounded shadow-md">Add More</button>
+        </div>
+        
+
+        <div class="mt-4">
+            <h2 class="text-xl font-bold">Overall Total Meals: <span id="overallTotal">0</span></h2>
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            updateTimestamp();
+            setInterval(updateTimestamp, 1000);
+            lockPastDays();
+            loadData();
+        });
+        
+        // Live timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').innerText = now.toLocaleString();
+        }
+        
+        // Lock past days
+        function lockPastDays() {
+            const currentDate = new Date();
+            const currentDay = currentDate.getDate();
+            
+            document.querySelectorAll('.meal-checkbox').forEach(checkbox => {
+                const day = parseInt(checkbox.dataset.day, 10);
+                if (day < currentDay) {
+                    checkbox.disabled = true;
+                    checkbox.style.pointerEvents = 'none';
+                }
+            });
+        }
+        
+        // Load data from local storage
+        function loadData() {
+            const studentTable = document.getElementById('studentTable');
+            
+            // Retrieve student count
+            const studentCount = localStorage.getItem('studentCount') || 0;
+            
+            for (let i = 1; i <= studentCount; i++) {
+                addStudentRow(i);
+            }
+            
+            document.querySelectorAll('#studentTable tr').forEach(row => {
+                const studentId = row.dataset.studentId;
+                if (!studentId) return;
+                
+                const studentName = localStorage.getItem(`studentName_${studentId}`);
+                if (studentName) {
+                    row.querySelector('.student-name').value = studentName;
+                }
+        
+                row.querySelectorAll('.meal-checkbox').forEach(checkbox => {
+                    const day = checkbox.dataset.day;
+                    const meal = checkbox.dataset.meal;
+                    const isChecked = localStorage.getItem(`meal_${studentId}_${day}_${meal}`) === 'true';
+                    checkbox.checked = isChecked;
+                });
+            });
+        }
+        
+        // Add a new student row
+        function addStudentRow(studentId = null) {
+            const table = document.getElementById('studentTable');
+            const rowCount = studentId || table.rows.length;
+            const row = table.insertRow();
+            row.dataset.studentId = rowCount;
+            
+            row.innerHTML = `
+                <td class="border px-4 py-2 fixed-name">${rowCount}</td>
+                <td class="border px-4 py-2 fixed-name">
+                    <input type="text" class="w-full border rounded px-2 py-1 student-name" value="Student ${rowCount}">
+                </td>
+                ${Array.from({ length: 31 }).map((_, i) => `
+                    <td class="border px-4 py-2 text-center">
+                        <input type="checkbox" class="meal-checkbox custom-checkbox" data-day="${i + 1}" data-meal="lunch">
+                    </td>
+                    <td class="border px-4 py-2 text-center">
+                        <input type="checkbox" class="meal-checkbox custom-checkbox" data-day="${i + 1}" data-meal="dinner">
+                    </td>
+                `).join('')}
+                <td class="border px-4 py-2 text-center">0</td>
+                <td class="border px-4 py-2 text-center">
+                    <button class="btn-gradient text-white px-4 py-2 rounded save-name">Save</button>
+                </td>
+            `;
+        
+            // Lock past days for newly added rows
+            lockPastDays();
+        }
+        
+        
+        // Save all data at once and show a single popup
+        document.querySelector('.save-data').addEventListener('click', function () {
+            let studentCount = 0;
+            let savedData = [];
+        
+            document.querySelectorAll('#studentTable tr').forEach(row => {
+                const studentId = row.dataset.studentId;
+                if (!studentId) return;
+        
+                studentCount++;
+                const studentName = row.querySelector('.student-name').value;
+                localStorage.setItem(`studentName_${studentId}`, studentName);
+        
+                row.querySelectorAll('.meal-checkbox').forEach(checkbox => {
+                    const day = checkbox.dataset.day;
+                    const meal = checkbox.dataset.meal;
+                    localStorage.setItem(`meal_${studentId}_${day}_${meal}`, checkbox.checked);
+                });
+        
+                savedData.push(`${studentName} (ID: ${studentId})`);
+            });
+        
+            localStorage.setItem('studentCount', studentCount);
+            alert(`Data saved successfully for:\n\n${savedData.join('\n')}`);
+        });
+        
+        // Add event listener for adding new rows
+        document.getElementById('addRow').addEventListener('click', function () {
+            const studentCount = parseInt(localStorage.getItem('studentCount') || 0) + 1;
+            localStorage.setItem('studentCount', studentCount);
+            addStudentRow(studentCount);
+        });
+        
+        // Reset data
+        document.getElementById('resetButton').addEventListener('click', function () {
+            if (confirm('Are you sure you want to reset all data?')) {
+                localStorage.clear();
+                document.getElementById('studentTable').innerHTML = '';
+                addStudentRow(1);
+                localStorage.setItem('studentCount', 1);
+                alert('All data has been reset.');
+            }
+        });
+        
+        // Calculate total meals, day (lunch) & night (dinner) meals
+document.querySelector('.calculate-total').addEventListener('click', function () {
+    const rows = document.querySelectorAll('#studentTable tr');
+    
+    let overallTotal = 0;
+    const dailyTotals = Array(31).fill(0); // Total meals per day
+    const lunchTotals = Array(31).fill(0); // Lunch count per day
+    const dinnerTotals = Array(31).fill(0); // Dinner count per day
+
+    rows.forEach(row => {
+        let totalMeals = 0;
+        row.querySelectorAll('.meal-checkbox').forEach(checkbox => {
+            if (checkbox.checked) {
+                totalMeals++;
+                overallTotal++;
+                const day = parseInt(checkbox.dataset.day, 10) - 1;
+
+                dailyTotals[day]++; // Add to total meals per day
+                if (checkbox.dataset.meal === 'lunch') {
+                    lunchTotals[day]++; // Add to lunch count
+                } else {
+                    dinnerTotals[day]++; // Add to dinner count
+                }
+            }
+        });
+
+        // Update the student's total meal count in the last column
+        row.cells[row.cells.length - 2].innerText = totalMeals;
+    });
+
+    // Update total meals per day in the table footer (if applicable)
+    document.querySelectorAll('.daily-total').forEach((cell, index) => {
+        cell.innerText = dailyTotals[index];
+    });
+
+    document.querySelectorAll('.day-total').forEach((cell, index) => {
+        cell.innerText = lunchTotals[index];
+    });
+
+    document.querySelectorAll('.night-total').forEach((cell, index) => {
+        cell.innerText = dinnerTotals[index];
+    });
+
+    // Update the overall total meals
+    document.getElementById('overallTotal').innerText = overallTotal;
+    
+    alert('Total meals calculated successfully!');
+});
+
+        
+        // Export to CSV
+        document.querySelector('.export-excel').addEventListener('click', function () {
+            const rows = document.querySelectorAll('#studentTable tr');
+            const data = [];
+            let overallTotal = 0;
+        
+            rows.forEach(row => {
+                const studentId = row.dataset.studentId;
+                const studentName = row.querySelector('.student-name').value;
+                const meals = Array.from(row.querySelectorAll('.meal-checkbox')).map(checkbox => checkbox.checked ? '1' : '0');
+                const totalMeals = row.cells[row.cells.length - 2].innerText;
+                overallTotal += parseInt(totalMeals, 10) || 0;
+                data.push([studentId, studentName, ...meals, totalMeals]);
+            });
+        
+            // CSV Header
+            const header = ['Student ID', 'Name', ...Array.from({ length: 31 }).flatMap((_, i) => [`Day ${i + 1} Lunch`, `Day ${i + 1} Dinner`]), 'Total Meals'];
+            
+            // CSV Content
+            let csvContent = 'data:text/csv;charset=utf-8,';
+            csvContent += header.join(',') + '\n';
+            csvContent += data.map(row => row.join(',')).join('\n');
+            
+            // Adding Overall Total at the end of CSV
+            csvContent += `\nOverall Total,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,${overallTotal}`;
+        
+            // Creating download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'meal_data.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+    </script>
+</body>
+</html>

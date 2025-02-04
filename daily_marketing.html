@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Marketing List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Add this script in the <head> section -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        body { font-family: 'Roboto', sans-serif; }
+        /* General button styling */
+        header{
+            border-radius: 7px;
+        }
+.btn {
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Save button gradient and hover animation */
+.save-btn {
+    background: linear-gradient(to right, #3b82f6, #6366f1);
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.save-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Calculate Total button gradient and hover animation */
+.calculate-btn {
+    background: linear-gradient(to right, #fbbf24, #f59e0b);
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.calculate-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Reset button gradient and hover animation */
+.reset-btn {
+    background: linear-gradient(to right, #ef4444, #dc2626);
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.reset-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Export button gradient and hover animation */
+.export-btn {
+    background: linear-gradient(to right, #10b981, #14b8a6);
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.export-btn:hover {
+    transform: scale(1.05);
+}
+a{
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+a:hover{
+    transform: scale(1.05);
+}
+
+    </style>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-orange-500 header-bg text-white p-4 flex justify-between items-center shadow-lg relative">
+        <!-- Centered H1 -->
+        <h1 class="text-2xl font-bold absolute left-1/2 transform -translate-x-1/2">Daily Marketing List</h1>
+        
+        <div class="flex items-center space-x-4">
+            <a href="index.html" class="text-white text-lg"><i class="fas fa-home"></i> Home</a>
+        </div>
+    </header>
+    <main class="container mx-auto p-4">
+        <form id="marketingForm" class="bg-white p-6 rounded shadow-md">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2">Month:</label>
+                <input type="text" id="month" class="w-full p-2 border rounded" readonly>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2">Day:</label>
+                <input type="text" id="day" class="w-full p-2 border rounded" readonly>
+            </div>
+            <table class="min-w-full bg-white">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border-b">Day</th>
+                        <th class="py-2 px-4 border-b">Student Name</th>
+                        <th class="py-2 px-4 border-b">Amount (INR)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Rows will be generated dynamically -->
+                </tbody>
+            </table>
+            <div class="mt-4 flex gap-5">
+                <button type="button" onclick="saveData()" class="save-btn bg-blue-500 text-white py-2 px-4 rounded">Save</button>
+                <button type="button" onclick="calculateTotal()" class="calculate-btn bg-yellow-500 text-white py-2 px-4 rounded">Calculate Total</button>
+                <button type="button" onclick="resetForm()" class="reset-btn bg-red-500 text-white py-2 px-4 rounded">Reset</button>
+                <button type="button" onclick="exportToExcel()" class="export-btn bg-green-500 text-white py-2 px-4 rounded">Export to Excel</button>
+            </div>
+        </form>
+        <footer class="mt-4 p-4 bg-gray-200 rounded shadow-md">
+            <p class="text-gray-700 font-bold">Total Amount: <span id="totalAmount">₹0.00</span></p>
+        </footer>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const date = new Date();
+            document.getElementById('month').value = date.toLocaleString('default', { month: 'long' });
+            document.getElementById('day').value = date.getDate();
+            generateTable();
+            loadData();
+        });
+
+        function generateTable() {
+            const tableBody = document.getElementById('tableBody');
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            for (let i = 1; i <= 31; i++) {
+                const dayDate = new Date(currentYear, currentMonth, i);
+                if (dayDate.getMonth() !== currentMonth) break;
+
+                const dayName = dayDate.toLocaleString('default', { weekday: 'long' });
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="py-2 px-4 border-b">${i} (${dayName})</td>
+                    <td class="py-2 px-4 border-b"><input type="text" class="w-full p-2 border rounded" name="studentName${i}"></td>
+                    <td class="py-2 px-4 border-b"><input type="number" class="w-full p-2 border rounded" name="amount${i}" step="0.01"></td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            for (let i = 1; i <= 31; i++) {
+                const amount = parseFloat(document.querySelector(`input[name="amount${i}"]`)?.value) || 0;
+                total += amount;
+            }
+            document.getElementById('totalAmount').textContent = `₹${total.toFixed(2)}`;
+        }
+
+        function saveData() {
+            const data = {};
+            for (let i = 1; i <= 31; i++) {
+                data[`studentName${i}`] = document.querySelector(`input[name="studentName${i}"]`)?.value || '';
+                data[`amount${i}`] = document.querySelector(`input[name="amount${i}"]`)?.value || '';
+            }
+            localStorage.setItem('marketingData', JSON.stringify(data));
+            alert('Data saved successfully!');
+        }
+
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('marketingData')) || {};
+            for (let i = 1; i <= 31; i++) {
+                if (document.querySelector(`input[name="studentName${i}"]`)) {
+                    document.querySelector(`input[name="studentName${i}"]`).value = data[`studentName${i}`] || '';
+                    document.querySelector(`input[name="amount${i}"]`).value = data[`amount${i}`] || '';
+                }
+            }
+            calculateTotal();
+        }
+
+        function resetForm() {
+            if (confirm('Are you sure you want to reset the form?')) {
+                document.getElementById('marketingForm').reset();
+                localStorage.removeItem('marketingData');
+                document.getElementById('totalAmount').textContent = '₹0.00';
+                alert('Form has been reset.');
+            }
+        }
+
+        function exportToExcel() {
+            const data = JSON.parse(localStorage.getItem('marketingData'));
+            if (!data) {
+                alert('No data to export!');
+                return;
+            }
+        
+            // Prepare data for Excel
+            let excelData = [["Day", "Student Name", "Amount (INR)"]]; // Header row
+        
+            for (let i = 1; i <= 31; i++) {
+                const studentName = data[`studentName${i}`] || '';
+                const amount = data[`amount${i}`] || '';
+                excelData.push([i, studentName, amount]); // Append row data
+            }
+        
+            // Create a worksheet and workbook
+            const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Marketing Data");
+        
+            // Export to Excel file
+            XLSX.writeFile(workbook, "marketing_data.xlsx");
+        }
+            
+    </script>
+</body>
+</html>

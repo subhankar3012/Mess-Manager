@@ -1,0 +1,193 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.container {
+    width: 80%;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-height: 90vh; /* Ensures it does not overflow */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    background: #ff6600;
+    padding: 10px 0;
+    z-index: 1000;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 7px;
+
+}
+#currentDateTime{
+    color: white;
+}
+
+h1 {
+    color: white;
+    font-size: 24px;
+}
+.buttons {
+    display: flex;
+    gap: 20px; /* Adds 20px space between buttons */
+}
+
+
+.btn {
+    background: #ff6600;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 7px;
+    font-size: 14px;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.btn:hover {
+    background: #cc5200;
+    transform: scale(1.1); /* Slightly enlarge */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+
+}
+/* Save Button - Green */
+#save {
+    background: #28a745;
+}
+
+#save:hover {
+    background: #218838;
+}
+
+/* Add More Button - Blue */
+#addRow {
+    background: #007bff;
+}
+
+#addRow:hover {
+    background: #0056b3;
+}
+
+/* Reset Button - Red */
+#reset {
+    background: #dc3545;
+}
+
+#reset:hover {
+    background: #c82333;
+}
+
+/* Calculate Total Button - Orange */
+#calculateTotal {
+    background: #fd7e14;
+}
+
+#calculateTotal:hover {
+    background: #e86c0c;
+}
+
+/* Export to Excel Button - Teal */
+#exportExcel {
+    background: #20c997;
+}
+
+#exportExcel:hover {
+    background: #1aa179;
+}
+
+.table-container {
+    flex-grow: 1;
+    overflow-y: auto; /* Makes table scrollable */
+    max-height: 60vh;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* ✅ Remove sticky position from thead */
+thead {
+    background: #ff6600;
+    color: white;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #ff6600;
+    color: white;
+}
+
+input, select {
+    width: 90%;
+    padding: 8px;
+    margin: 2px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    border-color: #ff6600;
+    outline: none;
+}
+
+.total-amount {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff6600;
+    background: white;
+    padding: 10px 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 1000;
+}
+a {
+    display: block;
+    padding: 10px;
+    margin: 5px 0;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    position: absolute;
+    top: 35px;
+    left: 40px;
+    background: #ff6600; /* Add a background color */
+    border-radius: 5px; /* Rounded edges */
+    transition: all 0.3s ease-in-out; /* Smooth animation */
+}
+a:hover {
+    background: #ff6600; /* Darker shade */
+    transform: scale(1.1); /* Slightly enlarge */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+}
+footer {
+    padding: 20px;
+    background-color: transparent;
+    display: flex;
+  
+}
+
